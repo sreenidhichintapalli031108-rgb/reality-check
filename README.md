@@ -54,9 +54,7 @@ npm run dev
 
 ### 4. Open the app
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3001
-- Health check: http://localhost:3001/api/health
+Demo : https://reality-check-red.vercel.app/
 
 ---
 
