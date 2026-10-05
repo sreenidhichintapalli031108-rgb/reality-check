@@ -1,0 +1,136 @@
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ArrowLeft, RotateCcw, FlaskConical } from 'lucide-react'
+import { Logo } from '../components/Logo'
+import { AssessmentBanner } from '../components/AssessmentBanner'
+import { SummaryCounts } from '../components/SummaryCounts'
+import { ClaimsList } from '../components/ClaimsList'
+import { RiskSignals } from '../components/RiskSignals'
+import { MissingInformation } from '../components/MissingInformation'
+import { RecommendedActions } from '../components/RecommendedActions'
+import { VerificationChecklist } from '../components/VerificationChecklist'
+import { EvidenceSection } from '../components/EvidenceSection'
+
+export function ResultsPage() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const report = location.state?.report
+  const isDemo = location.state?.isDemo === true
+
+  // If someone navigates directly without state, redirect to check
+  if (!report) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-slate-500 mb-4">No report found. Please run an analysis first.</p>
+          <button
+            onClick={() => navigate('/check')}
+            className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+          >
+            Start a Check
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Sticky nav */}
+      <nav className="border-b border-slate-200 bg-white px-4 sm:px-6 py-4 sticky top-0 z-10 shadow-sm">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(isDemo ? '/' : '/check')}
+              className="text-slate-400 hover:text-slate-600 transition-colors p-1"
+              aria-label="Back"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <Logo size="sm" />
+          </div>
+          <button
+            onClick={() => navigate('/check')}
+            className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+          >
+            <RotateCcw size={14} />
+            New Check
+          </button>
+        </div>
+      </nav>
+
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-4">
+
+        {/* DEMO MODE BANNER — shown only when isDemo is true */}
+        {isDemo && (
+          <div className="bg-violet-50 border border-violet-200 rounded-2xl px-5 py-4 flex items-start gap-3">
+            <FlaskConical size={18} className="text-violet-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-bold text-violet-800">
+                Demo Report
+              </p>
+              <p className="text-xs text-violet-600 mt-0.5 leading-relaxed">
+                This example uses pre-generated analysis and does not use an AI request.
+                It is shown to demonstrate what a Reality Check report looks like.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Page title */}
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">Verification Report</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Evidence-based analysis · Not a final verdict · Verify before acting
+          </p>
+        </div>
+
+        {/* 1. REALITY CHECK STATUS */}
+        <AssessmentBanner assessment={report.overallAssessment} />
+
+        {/* 2. SUMMARY COUNTS */}
+        <SummaryCounts
+          claims={report.claims}
+          riskSignals={report.riskSignals}
+          missingInformation={report.missingInformation}
+        />
+
+        {/* 3. DO THIS FIRST + full recommended actions */}
+        <RecommendedActions actions={report.recommendedActions} />
+
+        {/* 4. RISK SIGNALS */}
+        <RiskSignals signals={report.riskSignals} />
+
+        {/* 5. CLAIMS VS EVIDENCE */}
+        <ClaimsList claims={report.claims} />
+
+        {/* 6. WHAT WE DON'T KNOW */}
+        <MissingInformation items={report.missingInformation} />
+
+        {/* 7. VERIFICATION CHECKLIST */}
+        <VerificationChecklist
+          recommendedActions={report.recommendedActions}
+          missingInformation={report.missingInformation}
+        />
+
+        {/* 8. EVIDENCE & REFERENCES */}
+        <EvidenceSection evidence={report.evidence} />
+
+        {/* Disclaimer */}
+        <div className="bg-slate-100 rounded-xl p-4 text-xs text-slate-500 text-center leading-relaxed">
+          {isDemo
+            ? 'This is a pre-generated demo report for illustration purposes. It does not represent a real analysis of a real offer.'
+            : 'This report was generated by an AI analysis system. It is intended to help you ask the right questions — not to make a decision for you. Always verify claims independently through official channels before taking action.'}
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={() => navigate('/check')}
+          className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 rounded-xl transition-colors shadow-md"
+        >
+          <RotateCcw size={16} />
+          {isDemo ? 'Try with Your Own Content' : 'Start a New Check'}
+        </button>
+      </main>
+    </div>
+  )
+}
